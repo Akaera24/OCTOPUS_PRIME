@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       vir                                                       */
-/*    Created:      22/09/2024, 16:23:32                                      */
+/*    Author:       zhang769641                                               */
+/*    Created:      22/09/2024, 16:31:55                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
@@ -58,22 +58,57 @@ void autonomous(void) {
 /*  You must modify the code to add your own robot specific commands here.   */
 /*---------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       zhang769641                                               */
+/*    Created:      18/09/2024, 11:53:52                                      */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+#include "vex.h"
+
+using namespace vex;
+
+// A global instance of vex::brain used for printing to the V5 brain screen
+vex::brain       Brain;
+
+// define your global instances of motors and other devices here
+motor frontLeft = motor(19);
+motor frontRight = motor(16, true);
+motor backLeft = motor(20);
+motor backRight = motor(9, true);
+motor_group allWheels = motor_group(frontLeft, frontRight, backLeft, backRight);
+controller Controller1 = controller(primary);
+
 void usercontrol(void) {
-  // User control code here, inside the loop
-  while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
+    double rx = Controller1.Axis1.position(percent);
+    double ry = Controller1.Axis2.position(percent);
+    double lx = Controller1.Axis4.position(percent);
+    double ly = Controller1.Axis3.position(percent);
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+    while(1) {
+        double velocity1 = sqrt(2)/2 * (ry - rx);
+        double velocity2 = sqrt(2)/2 * (ry + rx);
 
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
-  }
+        frontLeft.setVelocity(velocity1, percent);
+        backRight.setVelocity(velocity1, percent);
+
+        frontRight.setVelocity(velocity2, percent);
+        backLeft.setVelocity(velocity2, percent);
+
+        allWheels.spin(forward);
+    }
 }
+
+int main() {
+    while(1) {
+        
+        // Allow other tasks to run
+        this_thread::sleep_for(10);
+    }
+}
+
 
 //
 // Main will set up the competition functions and callbacks.
